@@ -22,7 +22,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nSGNS_h_
@@ -63,9 +63,9 @@ struct Filter_Rec
     tFLT_Array k                __attribute__ ((aligned(16)));
     tFLT_Array State            __attribute__ ((aligned(16)));
     tFLT_Array xState           __attribute__ ((aligned(16)));
-    double e;                   __attribute__ ((aligned(16)));
-    double One_Over_Minus_C;    __attribute__ ((aligned(16)));
-    bool Valid;                 __attribute__ ((aligned(16)));
+    double e                    __attribute__ ((aligned(16)));
+    double One_Over_Minus_C     __attribute__ ((aligned(16)));
+    bool Valid                  __attribute__ ((aligned(16)));
 };
 
 //============================================================================

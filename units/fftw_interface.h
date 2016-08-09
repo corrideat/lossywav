@@ -16,7 +16,7 @@
 //  by Nick Currie (lossyWAV at hotmail <dot> co <dot> uk
 // --------------------------------------------------------------
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 // --------------------------------------------------------------
 
 #ifndef fftw_interface_h_

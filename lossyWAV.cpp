@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,7 +23,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #include "units/nCore.h"
@@ -80,13 +81,13 @@ public:
     }
 };
 
-int main(int32_t argc, char* argv[])
+int main(int argc, char* argv[])
 {
     Init init;
 
     try
     {
-        nParameter_Init(argc, argv);
+        nParameter_Init((uint32_t)argc, argv);
 
         nCheck_Switches();
 

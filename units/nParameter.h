@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,13 +23,13 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nParameter_h_
 #define nParameter_h_
 
-static const char lossyWAVHead1 [] = ", Copyright (C) 2007-2014 Nick Currie. Copyleft.\n";
+static const char lossyWAVHead1 [] = ", Copyright (C) 2016 Ricardo Iván Vieitez Parra.\nCopyright (C) 2007-2014 Nick Currie. Copyleft.\n";
 static const char lossyWAVHead2 [] = "This is free software under the GNU GPLv3+ license; There is NO WARRANTY, to\n"
                                      "the extent permitted by law. <http://www.gnu.org/licenses/> for details.\n";
 extern std::ofstream LogOutput;

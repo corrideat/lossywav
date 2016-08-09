@@ -22,7 +22,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
 
 #include "math.h"
@@ -88,10 +88,10 @@ void nCheck_Switches()
     }
     else
     {
-        settings.scaling_factor = 1.0d;
+        settings.scaling_factor = 1.0;
     }
 
-    settings.scaling_factor_inv = 1.0d / settings.scaling_factor;
+    settings.scaling_factor_inv = 1.0 / settings.scaling_factor;
 
     if (parameters.linkchannels || parameters.midside)
     {
@@ -183,7 +183,7 @@ void nCheck_Switches()
         }
         else
         {
-            parameters.feedback.round = numeric_factor_sqrt * (-1.0d);
+            parameters.feedback.round = numeric_factor_sqrt * (-1.0);
         }
 
         if (parameters.feedback.noise != -99)
@@ -192,7 +192,7 @@ void nCheck_Switches()
         }
         else
         {
-            parameters.feedback.noise = numeric_factor_sqrt * (-2.0d) + 1.625d * (parameters.shaping.altfilter);
+            parameters.feedback.noise = numeric_factor_sqrt * (-2.0) + 1.625 * (parameters.shaping.altfilter);
         }
 
         if (parameters.feedback.aclips != -99)
@@ -210,22 +210,22 @@ void nCheck_Switches()
         }
         else
         {
-            parameters.feedback.alevel = numeric_factor_sqrt * (-1.025d)  + 1.375d * (parameters.shaping.altfilter);
+            parameters.feedback.alevel = numeric_factor_sqrt * (-1.025)  + 1.375 * (parameters.shaping.altfilter);
         }
     }
     else
     {
         parameters.feedback.numeric = 0;
-        parameters.feedback.round = 0.0d;
-        parameters.feedback.noise = 0.0d;
+        parameters.feedback.round = 0.0;
+        parameters.feedback.noise = 0.0;
         parameters.feedback.aclips = 32;
-        parameters.feedback.alevel = 0.0d;
+        parameters.feedback.alevel = 0.0;
     }
 
-    parameters.feedback.round += 2.5d;
+    parameters.feedback.round += 2.5;
     parameters.feedback.round *= OneOver[50];
-    parameters.feedback.noise += -3.50d + 0.625d;
-    parameters.feedback.alevel += -3.25d;
+    parameters.feedback.noise += -3.50 + 0.625;
+    parameters.feedback.alevel += -3.25;
 
     if (parameters.midside)
     {
@@ -255,7 +255,7 @@ void nCheck_Switches()
     }
     else
     {
-        parameters.feedback.rclips = QUALITY_CLIPS_PER_CHANNEL[std::min(QUALITY_PRESET_MAX, settings.quality_integer + int32_t(settings.quality_fraction != 0.0d))];
+        parameters.feedback.rclips = QUALITY_CLIPS_PER_CHANNEL[std::min(QUALITY_PRESET_MAX, settings.quality_integer + int32_t(settings.quality_fraction != 0.0))];
     }
 
     if (!parameters.skewing)
@@ -274,7 +274,7 @@ void nInitial_Setup()
     double this_threshold_shift;
     double this_dccorrect_shift;
 
-    if (settings.quality_double < -5.0d)
+    if (settings.quality_double < -5.0)
     {
         settings.static_minimum_bits_to_keep = STATIC_MINIMUM_BITS_TO_KEEP - 1;
     }
@@ -285,13 +285,13 @@ void nInitial_Setup()
 
     if (parameters.limit != -1)
     {
-        Global.upper_freq_limit = std::min(floor(Global.sample_rate * 0.453515), parameters.limit * 1.0d);
+        Global.upper_freq_limit = std::min(floor(Global.sample_rate * 0.453515), parameters.limit * 1.0);
         strings.parameter += " --limit ";
         strings.parameter += floattostrf(Global.upper_freq_limit, 0);
     }
     else
     {
-        Global.upper_freq_limit = std::min(floor(Global.sample_rate * 0.453515), QUALITY_UPPER_CALC_FREQ_LIMIT[settings.quality_integer] * 1.0d);
+        Global.upper_freq_limit = std::min(floor(Global.sample_rate * 0.453515), QUALITY_UPPER_CALC_FREQ_LIMIT[settings.quality_integer] * 1.0);
     }
 
     Frequency_Limits[SPREAD_ZONES + 1] = Global.upper_freq_limit;

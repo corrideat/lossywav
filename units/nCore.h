@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,21 +23,36 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nCore_h_
 #define nCore_h_
 #define NOMINMAX 1
 
-#include <windows.h> // For now...
+#if defined(_WIN64) || defined(WIN64) || defined(_WIN32) || defined(WIN32)
+#define IS_WINDOWS
+#include <windows.h>
+#elif defined(__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#define IS_POSIX
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <time.h>
+#define GetLastError() (errno)
+#define ERROR_BROKEN_PIPE EPIPE
+#define LARGE_INTEGER uint64_t
+#else
+#error "Unsupported OS"
+#endif
 #include <cmath>
 #include <string>
-#include "..\version.h"
+#include "../version.h"
 #include "nSupport.h"
 #include "nComplex.h"
 
-
+/* TODO: Make this cross-platform */
 #if defined(_MSC_VER) && (_MSC_VER <= 1500)
 typedef   signed    char                     int8_t;
 typedef unsigned    char                    uint8_t;
@@ -48,6 +64,43 @@ typedef   signed    long    long    int     int64_t;
 typedef unsigned    long    long    int    uint64_t;
 #else
 #include <stdint.h>
+#endif
+
+#ifndef IS_WINDOWS
+typedef struct _GUID {
+  uint32_t Data1;
+  uint16_t  Data2;
+  uint16_t  Data3;
+  uint8_t  Data4[8];
+  bool operator!=(const struct _GUID &b) {
+      return (this->Data1 != b.Data1)
+        || (this->Data2 != b.Data2)
+        || (this->Data3 != b.Data3)
+        || (this->Data4[0] != b.Data4[0])
+        || (this->Data4[1] != b.Data4[1])
+        || (this->Data4[2] != b.Data4[2])
+        || (this->Data4[3] != b.Data4[3])
+        || (this->Data4[4] != b.Data4[4])
+        || (this->Data4[5] != b.Data4[5])
+        || (this->Data4[6] != b.Data4[6])
+        || (this->Data4[7] != b.Data4[7])
+    ;
+  }
+  bool operator==(const struct _GUID &b) {
+      return (this->Data1 != b.Data1)
+        && (this->Data2 == b.Data2)
+        && (this->Data3 == b.Data3)
+        && (this->Data4[0] == b.Data4[0])
+        && (this->Data4[1] == b.Data4[1])
+        && (this->Data4[2] == b.Data4[2])
+        && (this->Data4[3] == b.Data4[3])
+        && (this->Data4[4] == b.Data4[4])
+        && (this->Data4[5] == b.Data4[5])
+        && (this->Data4[6] == b.Data4[6])
+        && (this->Data4[7] == b.Data4[7])
+    ;
+  }
+} GUID;
 #endif
 
 static const char version_string[] = "lossyWAV ";
@@ -323,6 +376,7 @@ extern double OneOver[MAX_FFT_LENGTH + 2]     __attribute__ ((aligned(16)));
 //============================================================================
 extern struct timer_type
 {
+#ifdef IS_WINDOWS
     union
     {
         LARGE_INTEGER Frequency;
@@ -339,6 +393,9 @@ extern struct timer_type
         LARGE_INTEGER Stop;
         int64_t Stop64;
     };
+#elif defined(IS_POSIX)
+    struct timespec ts[2];
+#endif
     double Elapsed;
     time_t StartTime;
 } timer     __attribute__ ((aligned(16)));

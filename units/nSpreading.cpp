@@ -22,7 +22,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
 
 #include <cmath>
@@ -138,9 +138,9 @@ void Threshold_Index_Init()
         // Two constants below are used to achieve "closest" approximation to empirical noise calculations.
 
         this_reference_threshold = -2.5 + this_bit_to_remove
-                                   + 0.5d * (Global.Codec_Block.bits + nlog2(1 + PowersOf.Two[-1]) + nlog2(1 + PowersOf.Two[1 - this_bit_to_remove * 2]))
-                                   + nlog2(1 + PowersOf.Two[-1 - Global.Codec_Block.bits]) * 0.30769230769230769230769230769231d // Empirical constant #1;
-                                   - 0.0013444987323232079693278710922535d;                                                      // Empirical constant #2;
+                                   + 0.5 * (Global.Codec_Block.bits + nlog2(1 + PowersOf.Two[-1]) + nlog2(1 + PowersOf.Two[1 - this_bit_to_remove * 2]))
+                                   + nlog2(1 + PowersOf.Two[-1 - Global.Codec_Block.bits]) * 0.30769230769230769230769230769231 // Empirical constant #1;
+                                   - 0.0013444987323232079693278710922535;                                                      // Empirical constant #2;
 
         this_reference_threshold *= log10_2x20 * THRESHOLD_INDEX_SPREAD;
 

@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,7 +23,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #include <cstdlib>
@@ -202,7 +203,10 @@ const char lossyWAV_special_thanks [] =
     "Mark G Beckett       for the Delphi unit that provides an interface to the\n"
     "(Univ. of Edinburgh) relevant fftw routines in libfftw3-3.dll.\n"
     "\n"
-    "Don Cross            for the Complex-FFT algorithm originally used.\n";
+    "Don Cross            for the Complex-FFT algorithm originally used.\n"
+    "Ricardo I. Vieitez P. for the port to POSIX-compatible systems.\n"
+    "\n";
+
 
 const int32_t num_quality_synonyms = 6;
 
@@ -548,8 +552,11 @@ bool check_parameter()
         {
             parmerror_multiple_selection();
         }
-
+#ifdef IS_WINDOWS
         setpriority(BELOW_NORMAL_PRIORITY_CLASS);
+#elif defined(IS_POSIX)
+        nice(5);
+#endif
         parameters.priority = 1;
 
         return true;
@@ -565,7 +572,12 @@ bool check_parameter()
         }
 
         parameters.priority = 2;
+#ifdef IS_WINDOWS
         setpriority(IDLE_PRIORITY_CLASS);
+#elif defined(IS_POSIX)
+        nice(10);
+        // TODO: Use the sched API to set idle IO priority (ionice)
+#endif
 
         return true;
     }
@@ -976,7 +988,7 @@ bool check_parameter()
 
                 parameters.feedback.numeric = nround10(std::atof(current_parameter.c_str()),2);
 
-                check_permitted_values(parameters.feedback.numeric,0.0d,10.0d);
+                check_permitted_values(parameters.feedback.numeric,0.0,10.0);
 
                 continue;
             }
@@ -1005,7 +1017,7 @@ bool check_parameter()
 
                     parameters.feedback.round = nround10(std::atof(current_parameter.c_str()),3);
 
-                    check_permitted_values(parameters.feedback.round, -2.001d, 2.000d, 3);
+                    check_permitted_values(parameters.feedback.round, -2.001, 2.000, 3);
 
                     continue;
                 }
@@ -1039,7 +1051,7 @@ bool check_parameter()
 
                     parameters.feedback.noise = nround10(std::atof(current_parameter.c_str()),3);
 
-                    check_permitted_values(parameters.feedback.noise, -2.501d, 2.500d, 3);
+                    check_permitted_values(parameters.feedback.noise, -2.501, 2.500, 3);
 
                     continue;
                 }
@@ -1107,7 +1119,7 @@ bool check_parameter()
 
                     parameters.feedback.alevel = nround10(std::atof(current_parameter.c_str()),3);
 
-                    check_permitted_values(parameters.feedback.alevel, -2.001d, 2.000d, 3);
+                    check_permitted_values(parameters.feedback.alevel, -2.001, 2.000, 3);
 
                     continue;
                 }
@@ -1358,7 +1370,7 @@ bool check_parameter()
 
                 parameters.shaping.extra = std::atof(current_parameter.c_str());
 
-                check_permitted_values(parameters.shaping.extra, 0.0d, 25.0d,0);
+                check_permitted_values(parameters.shaping.extra, 0.0, 25.0,0);
 
                 continue;
             }

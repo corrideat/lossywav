@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo IvÃ¡n Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,11 +23,8 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
-#ifdef _WIN32
-    #include <fcntl.h>
-#endif
 
 #include <iostream>
 #include <cstring>
@@ -38,6 +36,15 @@
 #include "nParameter.h" // filemode
 #include "nMaths.h"
 #include "nOutput.h"
+
+#ifdef IS_WINDOWS
+#ifndef __WINE__
+    #include <io.h>
+    #include <fcntl.h>
+#else
+    #define _setmode(...)
+#endif
+#endif
 
 namespace {
 
@@ -138,7 +145,7 @@ struct tWAVHeader
 
 struct tChunkSize64 // declare ChunkSize64 structure
 {
-    char chunkId[4]; // chunk ID (i.e. “big1” – this chunk is a big one)
+    char chunkId[4]; // chunk ID (i.e. Â“big1Â” - this chunk is a big one)
     union
     {
         uint64_t ChunkSize;
@@ -214,7 +221,7 @@ struct CuePoint // declare CuePoint structure
 {
     uint32_t identifier;    // unique identifier for the cue point
     uint32_t position;      // position of the cue point in the play order
-    char dataChunkId[4];    // normally ‘data’
+    char dataChunkId[4];    // normally Â‘dataÂ’
     uint32_t chunkStart;    // used for wave lists
     uint32_t blockStart;    // Start of compressed data block containing the cue point
                             // (not used for PCM)
@@ -234,7 +241,7 @@ struct CueChunk // declare CueChunk structure
 struct JunkChunk // declare JunkChunk structure
 {
     tChunkHeader Header; // "JUNK" + Size
-    // least 28 if the chunk is intended as a place-holder for a ‘ds64’ chunk.
+    // least 28 if the chunk is intended as a place-holder for a Â‘ds64Â’ chunk.
     char ChunkDATA[]; // dummy bytes
 };
 
@@ -242,7 +249,7 @@ struct JunkChunk // declare JunkChunk structure
 struct ListChunk // declare ListChunk structure
 {
     tChunkHeader Header; // "list" + Size
-    char typeId[4]; // ‘adtl’ associated data list
+    char typeId[4]; // Â‘adtlÂ’ associated data list
 };
 
 
@@ -257,14 +264,14 @@ struct LabelChunk // declare LabelChunk structure
 struct MarkerEntry // declare MarkerEntry structure
 {
     uint32_t flags; // flags field
-    uint32_t sampleOffsetLow; // low 4 byte marker’s offset in samples in data chunk
-    uint32_t sampleOffsetHigh; // high 4 byte marker’s offset
+    uint32_t sampleOffsetLow; // low 4 byte markerÂ’s offset in samples in data chunk
+    uint32_t sampleOffsetHigh; // high 4 byte markerÂ’s offset
     uint32_t byteOffsetLow; // low and high 4 byte of the beginning of the nearest
     uint32_t byteOffsetHigh; // compressed frame next to marker (timely before)
-    uint32_t intraSmplOffsetHigh; // low and high 4 byte of marker’s offset in samples
+    uint32_t intraSmplOffsetHigh; // low and high 4 byte of markerÂ’s offset in samples
     uint32_t intraSmplOffsetLow; // relative to the position of the first sample in frame
     char     labelText[256]; // nullptr terminated label string
-    uint32_t lablChunkIdentifier; // link to ‘labl’ subchunk of ‘list’ chunk8
+    uint32_t lablChunkIdentifier; // link to Â‘lablÂ’ subchunk of Â‘listÂ’ chunk8
     GUID     vendorAndProduct; // GUID identifying specific vendor application
     uint32_t userData1; // 4 byte application specific user data
     uint32_t userData2; // 4 byte application specific user data
@@ -487,7 +494,11 @@ uint64_t readfrom_stdin(tRIFF_Rec &thisRIFF, void* buffpointer, uint64_t bytesto
         if (bytesthisread == 0)
         {
             ++ thisRIFF.File.Retries;
+#ifdef IS_WINDOWS
             Sleep(PowersOf.Two[std::min(7u, thisRIFF.File.Retries) -11]*1000);
+#elif defined(IS_POSIX)
+            sleep(PowersOf.Two[std::min(7u, thisRIFF.File.Retries) -11]*1000);
+#endif
         }
         else
         {
@@ -1257,7 +1268,7 @@ bool ReadChunkData(tRIFF_Rec& thisRIFF)
 
         thisRIFF.Chunks.FACT.Header = thisMapRecord->Header;
 
-        if (!thisRIFF.File.Read(thisRIFF, (char*) thisMapRecord->DATA, thisChunkSize) == thisChunkSize)
+        if (thisRIFF.File.Read(thisRIFF, (char*) thisMapRecord->DATA, thisChunkSize) != thisChunkSize)
         {
             wavIOExitProc("Error reading 'fact' chunk", 0x12);
         }
@@ -1292,7 +1303,7 @@ bool ReadChunkData(tRIFF_Rec& thisRIFF)
     }
     else
     {
-        if (!thisRIFF.File.Read(thisRIFF, (char*) thisMapRecord->DATA, thisChunkSize) == thisChunkSize)
+        if (thisRIFF.File.Read(thisRIFF, (char*) thisMapRecord->DATA, thisChunkSize) != thisChunkSize)
         {
             wavIOExitProc("Error reading '"+std::string(thisMapRecord->Header.ID,4)+"' chunk.", 0x12);
         }
@@ -1997,7 +2008,7 @@ bool openWavIO()
 
     if (parameters.STDINPUT)
     {
-        #ifdef _WIN32
+        #ifdef IS_WINDOWS
         _setmode(STDIN_FILENO, _O_BINARY);
         #endif
 
@@ -2041,7 +2052,7 @@ bool openWavIO()
 
     if (!RIFF.WAVE.File.Type.RIFF64)
     {
-        Global.Total_Samples = uint64_t((1.0d * RIFF.WAVE.Chunks.DATA.Header.Size) / Global.Channels / Global.bytes_per_sample);
+        Global.Total_Samples = uint64_t((1.0 * RIFF.WAVE.Chunks.DATA.Header.Size) / Global.Channels / Global.bytes_per_sample);
 
         Global.WAVE_size = RIFF.WAVE.Chunks.WAV.Header.Size;
 
@@ -2107,7 +2118,7 @@ bool openWavIO()
     }
     //========================================================================
 
-    Global.Codec_Block.Total = (uint64_t)(1.0d * (Global.Total_Samples + Global.Codec_Block.Size - 1) * Global.Channels * Global.Codec_Block.Size_recip);
+    Global.Codec_Block.Total = (uint64_t)(1.0 * (Global.Total_Samples + Global.Codec_Block.Size - 1) * Global.Channels * Global.Codec_Block.Size_recip);
 
     if (parameters.ignorechunksizes)
     {
@@ -2278,7 +2289,7 @@ bool openWavIO()
 
     if (parameters.STDOUTPUT)
     {
-        #ifdef _WIN32
+        #ifdef IS_WINDOWS
         _setmode(STDOUT_FILENO, _O_BINARY);
         #endif
 

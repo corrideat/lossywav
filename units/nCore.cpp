@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -22,7 +23,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #include <sstream>
@@ -30,6 +31,10 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+
+#ifdef IS_POSIX
+
+#endif
 
 #include "nCore.h"
 #include "nMaths.h"
@@ -99,11 +104,19 @@ void GetVersionInfo()
     version.Build   = AutoVersion::REVISION;
 }
 
-
+#define NS_PER_S (1E9)
 void gettimer()
 {
+#ifdef IS_WINDOWS
     QueryPerformanceCounter(&timer.Stop);
     timer.Elapsed = (timer.Stop64 - timer.Start64) * timer.Period;
+
+    if (timer.Elapsed != 0)
+        Global.processing_rate = Global.samples_processed * Global.sample_rate_recip / timer.Elapsed;
+#elif defined(IS_POSIX)
+    clock_gettime(CLOCK_MONOTONIC, &timer.ts[1]);
+    timer.Elapsed = (double) ((timer.ts[1].tv_nsec + timer.ts[1].tv_sec * NS_PER_S) - (timer.ts[0].tv_nsec + timer.ts[0].tv_sec * NS_PER_S)) / ((double)NS_PER_S);
+#endif
 
     if (timer.Elapsed != 0)
         Global.processing_rate = Global.samples_processed * Global.sample_rate_recip / timer.Elapsed;
@@ -112,7 +125,11 @@ void gettimer()
 
 void setpriority(int32_t spv)
 {
+#ifdef IS_WINDOWS
     SetPriorityClass(GetCurrentProcess(), spv);
+#elif defined(IS_POSIX)
+    // TODO: use in conjunction with sched
+#endif
 }
 
 
@@ -269,9 +286,13 @@ void nCore_Init()
     }
 
     timer.StartTime = std::time(nullptr);
+#ifdef IS_WINDOWS
     QueryPerformanceFrequency(&timer.Frequency);
     QueryPerformanceCounter(&timer.Start);
     timer.Period = 1.0 / timer.Frequency64;
+#elif defined(IS_POSIX)
+    clock_gettime(CLOCK_MONOTONIC, &timer.ts[0]);
+#endif
 
     for (nt_i = 0; nt_i < int(MAX_FFT_LENGTH); ++nt_i)
     {
@@ -344,18 +365,18 @@ void nCore_Init()
 
     for (nt_i = -1024; nt_i <= 1023; ++nt_i)
     {
-        PowersOf.Two[nt_i] = std::pow(2.0d, nt_i);
+        PowersOf.Two[nt_i] = std::pow(2.0, nt_i);
     }
 
     for (nt_i = -308; nt_i <= 307; ++nt_i)
     {
-        PowersOf.Ten[nt_i] = std::pow(10.0d, nt_i);
+        PowersOf.Ten[nt_i] = std::pow(10.0, nt_i);
     }
 
     OneOver[0] = 1;
 
     for (nt_i = 1; nt_i <= MAX_FFT_LENGTH + 1; ++nt_i)
     {
-        OneOver[nt_i] = 1.0d / nt_i;
+        OneOver[nt_i] = 1.0 / nt_i;
     }
 }

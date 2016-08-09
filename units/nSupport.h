@@ -3,6 +3,7 @@
 //    lossyWAV: Added noise WAV bit reduction method by David Robinson;
 //              Noise shaping coefficients by Sebastian Gesemann;
 //
+//    Copyright (C) 2016 Ricardo Iván Vieitez Parra
 //    Copyright (C) 2007-2013 Nick Currie, Copyleft.
 //
 //    This program is free software: you can redistribute it and/or modify
@@ -21,11 +22,16 @@
 //    Contact: lossywav <at> hotmail <dot> co <dot> uk
 //
 //==============================================================================
-//    by Tyge L�vset (tycho), Aug. 2012
+//    by Tyge Løvset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nSupport_h_
 #define nSupport_h_
+
+#ifdef IS_POSIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 #include <ctime>
 #include <sstream>
@@ -69,22 +75,33 @@ inline std::string floattostrf(double number, int32_t digits)
 
 inline bool FileIsReadOnly(const std::string& fileName_in)
 {
+#ifdef IS_WINDOWS
     DWORD fAttr = GetFileAttributesA(fileName_in.c_str());
     if (fAttr == INVALID_FILE_ATTRIBUTES)
         return false;  //something is wrong with your path!
     if (fAttr & FILE_ATTRIBUTE_READONLY)
         return true;   // file is read only!
+#elif defined(IS_POSIX)
+    return (access(fileName_in.c_str(), R_OK) != 0);
+#endif
     return false;    // file is not read only!
 }
 
 
 inline bool DirectoryExists(const std::string& dirName_in)
 {
+#ifdef IS_WINDOWS
     DWORD fAttrib = GetFileAttributesA(dirName_in.c_str());
     if (fAttrib == INVALID_FILE_ATTRIBUTES)
         return false;  //something is wrong with your path!
     if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
         return true;   // this is a directory!
+#elif defined(IS_POSIX)
+    struct stat sb;
+    if (stat(dirName_in.c_str(), &sb) != -1)  {
+        return S_ISDIR(sb.st_mode) && access(dirName_in.c_str(), F_OK);
+    }
+#endif
     return false;    // this is not a directory! } {
 }
 

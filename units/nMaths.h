@@ -22,7 +22,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nMaths_h_
@@ -34,8 +34,8 @@
 
 //=====================================================================
 
-static const double log2_10_over_10 = log2_10 / 10.0d;
-static const double log2_10_over_20 = log2_10 / 20.0d;
+static const double log2_10_over_10 = log2_10 / 10.0;
+static const double log2_10_over_20 = log2_10 / 20.0;
 
 inline int32_t nRoundEvenInt32(double val)
 {
@@ -43,7 +43,7 @@ inline int32_t nRoundEvenInt32(double val)
     double temp_frac = (std::abs(val) - temp_int);
     temp_frac += temp_frac;
 
-    return int32_t     (temp_frac == 1.0d ?
+    return int32_t     (temp_frac == 1.0 ?
                    (val > 0 ? temp_int + (temp_int & 1) : -(temp_int + (temp_int & 1))) :
                    (val > 0 ? temp_int + int(temp_frac) : -(temp_int + int(temp_frac))));
 }
@@ -54,7 +54,7 @@ inline int32_t nRoundOddInt32(double val)
     double temp_frac = (std::abs(val) - temp_int);
     temp_frac += temp_frac;
 
-    return int32_t     (temp_frac == 1.0d ?
+    return int32_t     (temp_frac == 1.0 ?
                    (val > 0 ? temp_int + ((temp_int & 1) ^ 1) : -(temp_int + ((temp_int & 1) ^ 1))) :
                    (val > 0 ? temp_int + int(temp_frac) : -(temp_int + int(temp_frac))));
 }
@@ -68,7 +68,7 @@ inline int64_t nRoundEvenInt64(double val)
     int64_t temp_int = std::abs(val);
     double temp_frac = (std::abs(val) - temp_int);
     temp_frac += temp_frac;
-    return int64_t (temp_frac == 1.0d ?
+    return int64_t (temp_frac == 1.0 ?
                    (val > 0 ? temp_int + (temp_int & 1) : -(temp_int + (temp_int & 1))) :
                    (val > 0 ? temp_int + int(temp_frac) : -(temp_int + int(temp_frac))));
 }
@@ -80,7 +80,7 @@ inline int64_t nRoundOddInt64(double val)
     double temp_frac = (std::abs(val) - temp_int);
     temp_frac += temp_frac;
 
-    return int64_t (temp_frac == 1.0d ?
+    return int64_t (temp_frac == 1.0 ?
                    (val > 0 ? temp_int + ((temp_int & 1) ^ 1) : -(temp_int + ((temp_int & 1) ^ 1))) :
                    (val > 0 ? temp_int + int(temp_frac) : -(temp_int + int(temp_frac))));
 }
@@ -206,7 +206,7 @@ inline double CubicInterp(CubicInterp_Rec* CubicData)
     //return CubicData->last = a0 * CubicData->x * x_p2 + a1 * x_p2 + a2 * CubicData->x + CubicData->y1;
 
     return CubicData->last = (CubicData->y3 - CubicData->y2 - CubicData->y0 + CubicData->y1) * CubicData->x * x_p2 + (CubicData->y0 - CubicData->y3 + CubicData->y2 + CubicData->y0) * x_p2 + (CubicData->y2 - CubicData->y0) * CubicData->x + CubicData->y1;
-//    return CubicData->last = CubicData->y1 + 0.5d * (((((3 * (CubicData->y1 - CubicData->y2) + CubicData->y3 - CubicData->y0) * CubicData->x) + (CubicData->y0 + CubicData->y0 - 4 * (CubicData->y1 - CubicData->y2) - CubicData->y1 - CubicData->y3)) * CubicData->x + (CubicData->y2 - CubicData->y0)) * CubicData->x);
+//    return CubicData->last = CubicData->y1 + 0.5 * (((((3 * (CubicData->y1 - CubicData->y2) + CubicData->y3 - CubicData->y0) * CubicData->x) + (CubicData->y0 + CubicData->y0 - 4 * (CubicData->y1 - CubicData->y2) - CubicData->y1 - CubicData->y3)) * CubicData->x + (CubicData->y2 - CubicData->y0)) * CubicData->x);
 }
 
 
@@ -229,11 +229,11 @@ inline double CubicInterpMaxLimit(CubicInterp_Rec* CubicData)
     CubicData->last = (CubicData->y3 - CubicData->y2 - CubicData->y0 + CubicData->y1) * CubicData->x * x_p2 + (CubicData->y0 - CubicData->y3 + CubicData->y2 + CubicData->y0) * x_p2 + (CubicData->y2 - CubicData->y0) * CubicData->x + CubicData->y1;
 
 //    double rx = (CubicData->y1 - CubicData->y2);
-//    double r0 = ((3.0d * rx + CubicData->y3 - CubicData->y0) * CubicData->x);
-//    double r1 = (CubicData->y0 + CubicData->y0 - 4.0d * rx - CubicData->y1 - CubicData->y3);
-//    CubicData->last = CubicData->y1 + 0.5d * ((r0 + r1) * x_p2 + (CubicData->y2 - CubicData->y0) * CubicData->x);
+//    double r0 = ((3.0 * rx + CubicData->y3 - CubicData->y0) * CubicData->x);
+//    double r1 = (CubicData->y0 + CubicData->y0 - 4.0 * rx - CubicData->y1 - CubicData->y3);
+//    CubicData->last = CubicData->y1 + 0.5 * ((r0 + r1) * x_p2 + (CubicData->y2 - CubicData->y0) * CubicData->x);
 
-//    CubicData->last = CubicData->y1 + 0.5d * (((((3 * (CubicData->y1 - CubicData->y2) + CubicData->y3 - CubicData->y0) * CubicData->x) + (CubicData->y0 + CubicData->y0 - 4 * (CubicData->y1 - CubicData->y2) - CubicData->y1 - CubicData->y3)) * CubicData->x + (CubicData->y2 - CubicData->y0)) * CubicData->x);
+//    CubicData->last = CubicData->y1 + 0.5 * (((((3 * (CubicData->y1 - CubicData->y2) + CubicData->y3 - CubicData->y0) * CubicData->x) + (CubicData->y0 + CubicData->y0 - 4 * (CubicData->y1 - CubicData->y2) - CubicData->y1 - CubicData->y3)) * CubicData->x + (CubicData->y2 - CubicData->y0)) * CubicData->x);
 
     return CubicData->last -= (CubicData->last - CubicData->y2) * (CubicData->last > CubicData->y2);
 }
@@ -253,24 +253,24 @@ inline double dB_Power_Ratio(double dB_Value)
 
 inline double Bark(double Frequency_Value)
 {
-    if (Frequency_Value < 421.6d)
-        return Frequency_Value * 0.01d;
+    if (Frequency_Value < 421.6)
+        return Frequency_Value * 0.01;
     else
-        return (26.81d / (1.0d + (1960.0d / Frequency_Value)) - 0.53d);
-//    return 13.0d * atan(0.00076d * frequency) + 3.5d * atan(nsqrd(frequency / 7500.0d));
+        return (26.81 / (1.0 + (1960.0 / Frequency_Value)) - 0.53);
+//    return 13.0 * atan(0.00076 * frequency) + 3.5 * atan(nsqrd(frequency / 7500.0));
 }
 
 inline double Frequency_from_Bark(double Bark_Value)
 {
-    if (Bark_Value < 4.216d)
-        return Bark_Value * 100.0d;
+    if (Bark_Value < 4.216)
+        return Bark_Value * 100.0;
     else
-        return (1960.0d / (26.81d / (Bark_Value + 0.53d) - 1.0d));
+        return (1960.0 / (26.81 / (Bark_Value + 0.53) - 1.0));
 }
 
 inline double Critical_Bandwidth(double Bark_Value)
 {
-    return 52548.0d / ((Bark_Value * Bark_Value) - (52.56d * Bark_Value) + 690.39d);
+    return 52548.0 / ((Bark_Value * Bark_Value) - (52.56 * Bark_Value) + 690.39);
 }
 
 #endif // nMaths_h_

@@ -47,7 +47,7 @@
 //      Radix Four and Eight added to inverse FFT;
 //      Bit-reversal arrays added for each FFT length.
 //
-// 2012 Aug [Tyge Løvset (tycho), Aug. 2012]
+// 2012 Aug [Tyge LÃ¸vset (tycho), Aug. 2012]
 //     Translated to C++ from Delphi
 //
 // 2009 May [Nick Currie]

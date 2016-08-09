@@ -22,7 +22,7 @@
 //
 //==============================================================================
 //    Initial translation to C++ from Delphi
-//    by Tyge Løvset (tycho), Aug. 2012
+//    by Tyge LÃ¸vset (tycho), Aug. 2012
 //==============================================================================
 
 #ifndef nFFT_h_
@@ -48,7 +48,7 @@ void Radix_02_DIT(FFT_Proc_Rec*);
 
 inline long double Hann(int32_t Index, int32_t fft_bit_length)
 {
-    return 0.5d * (1.0d - std::cos(Index * TwoPi * PowersOf.Two[-fft_bit_length]));
+    return 0.5 * (1.0 - std::cos(Index * TwoPi * PowersOf.Two[-fft_bit_length]));
 }
 
 //==============================================================================
